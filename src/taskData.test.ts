@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   createCategory,
+  createId,
   getCategoryProgress,
   getSubtaskProgress,
   isOverdue,
@@ -32,6 +33,19 @@ function makeTask(overrides: Partial<Task> = {}): Task {
     ...overrides,
   };
 }
+
+describe("createId", () => {
+  it("creates an ID from the current time and a random suffix", () => {
+    vi.spyOn(Date, "now").mockReturnValue(123456789);
+    vi.spyOn(Math, "random").mockReturnValue(0.5);
+
+    const id = createId();
+
+    expect(id).toBe(`${(123456789).toString(36)}-${(0.5).toString(36).slice(2, 8)}`);
+
+    vi.restoreAllMocks();
+  });
+});
 
 describe("categories and tasks", () => {
   it("creates and deletes categories together with their tasks", () => {
@@ -167,6 +181,43 @@ describe("LocalStorage persistence", () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
     const storage = {
       getItem: () => JSON.stringify({ categories: [], tasks: [{}] }),
+      setItem: () => {},
+    };
+
+    expect(loadData(storage).categories.length).toBeGreaterThan(0);
+    expect(error).toHaveBeenCalledOnce();
+    error.mockRestore();
+  });
+
+  it("rejects categories with invalid data", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const storage = {
+      getItem: () =>
+        JSON.stringify({
+          categories: [{ id: 123, name: "Study", color: "blue" }],
+          tasks: [],
+        }),
+      setItem: () => {},
+    };
+
+    expect(loadData(storage).categories.length).toBeGreaterThan(0);
+    expect(error).toHaveBeenCalledOnce();
+    error.mockRestore();
+  });
+
+  it("rejects tasks with invalid subtasks", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const storage = {
+      getItem: () =>
+        JSON.stringify({
+          categories: [],
+          tasks: [
+            {
+              ...makeTask(),
+              subtasks: [{ id: "step-1", title: "Study", completed: "yes" }],
+            },
+          ],
+        }),
       setItem: () => {},
     };
 
