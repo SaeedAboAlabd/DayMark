@@ -17,4 +17,3 @@ assignees: ""
 ## Expected behavior
 
 ## Browser and environment
-

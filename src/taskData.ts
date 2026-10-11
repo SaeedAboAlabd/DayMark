@@ -153,7 +153,9 @@ export function createCategory(
 ): Category {
   const cleanedName = name.trim();
   if (!cleanedName) throw new Error("Category name cannot be empty.");
-  if (existingCategories.some((category) => category.name.toLowerCase() === cleanedName.toLowerCase())) {
+  if (
+    existingCategories.some((category) => category.name.toLowerCase() === cleanedName.toLowerCase())
+  ) {
     throw new Error("A category with that name already exists.");
   }
   return {
@@ -249,9 +251,7 @@ export function toggleSubtaskCompletion(
         ? {
             ...task,
             subtasks: task.subtasks.map((subtask) =>
-              subtask.id === subtaskId
-                ? { ...subtask, completed: !subtask.completed }
-                : subtask,
+              subtask.id === subtaskId ? { ...subtask, completed: !subtask.completed } : subtask,
             ),
           }
         : task,

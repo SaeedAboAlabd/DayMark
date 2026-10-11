@@ -1,0 +1,5 @@
+
+npm run format:check
+npx eslint .
+npm run typecheck
+npm test

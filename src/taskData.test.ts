@@ -177,7 +177,12 @@ describe("LocalStorage persistence", () => {
 
   it("reports storage write failures", () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
-    const storage = { getItem: () => null, setItem: () => { throw new Error("quota"); } };
+    const storage = {
+      getItem: () => null,
+      setItem: () => {
+        throw new Error("quota");
+      },
+    };
 
     saveData(emptyData, storage);
 
